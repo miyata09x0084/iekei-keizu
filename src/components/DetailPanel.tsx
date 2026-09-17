@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { EDGE_LABEL, LINEAGES, STATUS_LABEL, type Shop } from "@/data/shops";
 import type { PlacedShop } from "@/lib/layout";
 
@@ -21,10 +21,10 @@ function RelChip({ shop, onSelect }: { shop: Shop; onSelect: (id: string) => voi
 }
 
 export function DetailPanel({ shop: current, nodes, onSelect, onClose }: Props) {
-  // 閉じるスライドアニメーションの間も直前の内容を残す
-  const last = useRef<PlacedShop | null>(null);
-  if (current) last.current = current;
-  const shop = current ?? last.current;
+  // 閉じるスライドアニメーションの間も直前の内容を残す（レンダー中の state 調整パターン）
+  const [last, setLast] = useState<PlacedShop | null>(current);
+  if (current && current !== last) setLast(current);
+  const shop = current ?? last;
   const open = !!current;
   const master = shop?.parent ? nodes.find((n) => n.id === shop.parent) ?? null : null;
   const kids = shop ? nodes.filter((n) => n.parent === shop.id).sort((a, b) => a.founded - b.founded) : [];

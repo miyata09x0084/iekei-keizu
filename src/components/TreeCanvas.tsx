@@ -160,10 +160,12 @@ export function TreeCanvas({ ref, layout, filter, selectedId, onSelect }: Props)
     const n = layout.nodes.find((x) => x.id === id);
     if (!d || !stage || !n) return;
     const W = stage.clientWidth, H = stage.clientHeight;
-    // 詳細パネルが開く分だけ左へ寄せて中央に置く
-    const panelW = W > 640 ? 370 : 0;
+    // 詳細パネルが開く分だけ避けて中央に置く：PC は右パネル分を左へ、スマホは下部シート分を上へ
+    const mobile = W <= 640;
+    const panelW = mobile ? 0 : 370;
+    const cy = mobile ? H * 0.21 : H / 2;
     const s = Math.max(d3.zoomTransform(d.svg.node()!).k, 1.1);
-    const t = d3.zoomIdentity.translate((W - panelW) / 2 - n.x * s, H / 2 - (n.y + labelHeight(n) / 2) * s).scale(s);
+    const t = d3.zoomIdentity.translate((W - panelW) / 2 - n.x * s, cy - (n.y + labelHeight(n) / 2) * s).scale(s);
     if (reducedMotion()) d.svg.call(d.zoom.transform, t);
     else d.svg.transition().duration(600).call(d.zoom.transform, t);
   }

@@ -1,4 +1,4 @@
-import type { Shop } from "@/data/shops";
+import type { LineageKey, Pref, Shop } from "@/data/shops";
 
 /** 指定の店から吉村家まで遡った id の集合（自身を含む） */
 export function ancestry(id: string, byId: Map<string, Shop>): Set<string> {
@@ -12,8 +12,8 @@ export function ancestry(id: string, byId: Map<string, Shop>): Set<string> {
 }
 
 export interface FilterState {
-  lineages: Set<string>;
-  prefs: Set<string>;
+  lineages: Set<LineageKey>;
+  prefs: Set<Pref>;
   year: number;
   query: string;
 }

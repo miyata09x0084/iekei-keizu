@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import * as d3 from "d3";
-import { LINEAGES, NODES, PREFS, YEAR_MAX, YEAR_MIN, type LineageKey } from "@/data/shops";
+import { LINEAGES, NODES, PREFS, YEAR_MAX, YEAR_MIN, type LineageKey, type Pref } from "@/data/shops";
 import { computeLayout } from "@/lib/layout";
 import { matches, type FilterState } from "@/lib/ancestry";
 import { TreeCanvas, type TreeHandle } from "./TreeCanvas";
@@ -10,15 +10,18 @@ import { DetailPanel } from "./DetailPanel";
 import { Legend } from "./Legend";
 
 const LINEAGE_CHIPS = (Object.keys(LINEAGES) as LineageKey[]).filter((k) => k !== "root");
+// 修行系譜としての系統数（総本山と資本系を除く）
+const LINEAGE_COUNT = LINEAGE_CHIPS.filter((k) => k !== "capital").length;
 
 export function Keizu() {
   const layout = useMemo(() => computeLayout(NODES), []);
   const tree = useRef<TreeHandle>(null);
 
-  const [lineages, setLineages] = useState<string[]>([]);
-  const [prefs, setPrefs] = useState<string[]>([]);
+  const [lineages, setLineages] = useState<LineageKey[]>([]);
+  const [prefs, setPrefs] = useState<Pref[]>([]);
   const [query, setQuery] = useState("");
-  const [year, setYear] = useState(YEAR_MAX);
+  // 初回は 1974 年から再生するため、最初の描画時点で吉村家以外を非表示にしておく
+  const [year, setYear] = useState(YEAR_MIN);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const filter = useMemo<FilterState>(
@@ -29,26 +32,32 @@ export function Keizu() {
 
   // 1974年から現在へ暖簾が広がる再生。ページ読込時に1度だけ自動再生
   const timer = useRef<d3.Timer | null>(null);
-  function replay() {
+  function stopTimer() {
     timer.current?.stop();
+    timer.current = null;
+  }
+  function replay() {
+    stopTimer();
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) { setYear(YEAR_MAX); return; }
     const dur = 2800;
     timer.current = d3.timer((el) => {
       const t = Math.min(1, el / dur);
       setYear(Math.round(YEAR_MIN + d3.easeCubicOut(t) * (YEAR_MAX - YEAR_MIN)));
-      if (t >= 1) { timer.current?.stop(); timer.current = null; }
+      if (t >= 1) stopTimer();
     });
   }
   useEffect(() => {
     replay();
-    return () => timer.current?.stop();
+    return stopTimer;
+    // マウント時に1度だけ再生する意図。replay は state に依存しない
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function select(id: string | null) {
     setSelectedId(id);
-    if (id) tree.current?.focus(id, true);
+    if (id) tree.current?.focus(id);
   }
-  function toggle(list: string[], set: (v: string[]) => void, key: string) {
+  function toggle<T>(list: T[], set: (v: T[]) => void, key: T) {
     set(list.includes(key) ? list.filter((k) => k !== key) : [...list, key]);
   }
   function onQuery(v: string) {
@@ -63,7 +72,7 @@ export function Keizu() {
   }
 
   const stats: [string | number, string][] = [
-    [NODES.length, "店舗"], [layout.generations, "世代"], [LINEAGE_CHIPS.length - 1, "系統"], [YEAR_MIN, "創業年"],
+    [NODES.length, "店舗"], [layout.generations, "世代"], [LINEAGE_COUNT, "系統"], [YEAR_MIN, "創業年"],
   ];
 
   return (
@@ -88,7 +97,7 @@ export function Keizu() {
             <div className="chips">
               {LINEAGE_CHIPS.map((k) => (
                 <button key={k} type="button" className="chip" aria-pressed={lineages.includes(k)}
-                  style={{ "--c": LINEAGES[k].color } as React.CSSProperties} onClick={() => toggle(lineages, setLineages, k)}>
+                  style={{ "--c": LINEAGES[k].color } as CSSProperties} onClick={() => toggle(lineages, setLineages, k)}>
                   <span className="dot" />{LINEAGES[k].label}
                 </button>
               ))}
@@ -104,7 +113,7 @@ export function Keizu() {
           <div className="group year">
             <span>年</span>
             <input type="range" id="year" min={YEAR_MIN} max={YEAR_MAX} value={year} aria-label="表示する年"
-              onChange={(e) => { timer.current?.stop(); setYear(+e.target.value); }} />
+              onChange={(e) => { stopTimer(); setYear(+e.target.value); }} />
             <output id="year-out" htmlFor="year">{year}</output>
             <button className="btn" id="replay" type="button" onClick={replay}>1974年から再生</button>
           </div>

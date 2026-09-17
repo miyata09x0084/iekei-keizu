@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { useEffect, useImperativeHandle, useLayoutEffect, useRef, type Ref } from "react";
 import * as d3 from "d3";
 import { LINEAGES, SHOP_BY_ID } from "@/data/shops";
 import { LEVEL, MARK, PAD_TOP, CH, SUBCH, SIB, labelHeight, type Layout, type PlacedShop, type Link } from "@/lib/layout";
@@ -8,11 +8,12 @@ import { ancestry, matches, type FilterState } from "@/lib/ancestry";
 
 export interface TreeHandle {
   fit: (animate: boolean) => void;
-  focus: (id: string, panelOpen: boolean) => void;
+  focus: (id: string) => void;
   zoomBy: (k: number) => void;
 }
 
 interface Props {
+  ref: Ref<TreeHandle>;
   layout: Layout;
   filter: FilterState;
   selectedId: string | null;
@@ -26,11 +27,12 @@ type GSel = d3.Selection<SVGGElement, unknown, null, undefined>;
  * D3 が SVG を専有する描画面。React は props の変化を class の付け替えとして伝えるだけで、
  * SVG の再構築は行わない（初回マウント時のみ構築）。
  */
-export const TreeCanvas = forwardRef<TreeHandle, Props>(function TreeCanvas({ layout, filter, selectedId, onSelect }, ref) {
+export function TreeCanvas({ ref, layout, filter, selectedId, onSelect }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  // D3 のハンドラは初回構築時に束縛するため、最新の onSelect を ref 経由で参照する
   const onSelectRef = useRef(onSelect);
-  onSelectRef.current = onSelect;
+  useLayoutEffect(() => { onSelectRef.current = onSelect; });
 
   // D3 側で保持する参照（React の再レンダリングと無関係）
   const d3Ref = useRef<{
@@ -153,12 +155,13 @@ export const TreeCanvas = forwardRef<TreeHandle, Props>(function TreeCanvas({ la
     else d.svg.call(d.zoom.transform, t);
   }
 
-  function focus(id: string, panelOpen: boolean) {
+  function focus(id: string) {
     const d = d3Ref.current, stage = stageRef.current;
     const n = layout.nodes.find((x) => x.id === id);
     if (!d || !stage || !n) return;
     const W = stage.clientWidth, H = stage.clientHeight;
-    const panelW = W > 640 && panelOpen ? 370 : 0;
+    // 詳細パネルが開く分だけ左へ寄せて中央に置く
+    const panelW = W > 640 ? 370 : 0;
     const s = Math.max(d3.zoomTransform(d.svg.node()!).k, 1.1);
     const t = d3.zoomIdentity.translate((W - panelW) / 2 - n.x * s, H / 2 - (n.y + labelHeight(n) / 2) * s).scale(s);
     if (reducedMotion()) d.svg.call(d.zoom.transform, t);
@@ -178,4 +181,4 @@ export const TreeCanvas = forwardRef<TreeHandle, Props>(function TreeCanvas({ la
       <svg className="tree" ref={svgRef} role="img" aria-label="家系ラーメンの系図" />
     </div>
   );
-});
+}

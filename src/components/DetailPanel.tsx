@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, type CSSProperties } from "react";
 import { EDGE_LABEL, LINEAGES, STATUS_LABEL, type Shop } from "@/data/shops";
 import type { PlacedShop } from "@/lib/layout";
 
@@ -12,14 +13,19 @@ interface Props {
 
 function RelChip({ shop, onSelect }: { shop: Shop; onSelect: (id: string) => void }) {
   return (
-    <button type="button" className="chip" style={{ "--c": LINEAGES[shop.lineage].color } as React.CSSProperties} onClick={() => onSelect(shop.id)}>
+    <button type="button" className="chip" style={{ "--c": LINEAGES[shop.lineage].color } as CSSProperties} onClick={() => onSelect(shop.id)}>
       <span className="dot" />
       {shop.name}{shop.sub ? `（${shop.sub}）` : ""}
     </button>
   );
 }
 
-export function DetailPanel({ shop, nodes, onSelect, onClose }: Props) {
+export function DetailPanel({ shop: current, nodes, onSelect, onClose }: Props) {
+  // 閉じるスライドアニメーションの間も直前の内容を残す
+  const last = useRef<PlacedShop | null>(null);
+  if (current) last.current = current;
+  const shop = current ?? last.current;
+  const open = !!current;
   const master = shop?.parent ? nodes.find((n) => n.id === shop.parent) ?? null : null;
   const kids = shop ? nodes.filter((n) => n.parent === shop.id).sort((a, b) => a.founded - b.founded) : [];
   const gen = shop
@@ -30,12 +36,12 @@ export function DetailPanel({ shop, nodes, onSelect, onClose }: Props) {
     : "";
 
   return (
-    <aside className={`panel${shop ? " open" : ""}`} id="panel" aria-live="polite" aria-hidden={!shop}>
+    <aside className={`panel${open ? " open" : ""}`} id="panel" aria-live="polite" inert={!open}>
       <button className="btn close" type="button" onClick={onClose}>閉じる</button>
       {shop && (
         <>
           <p className="p-lineage">
-            <span className="dot" style={{ "--c": LINEAGES[shop.lineage].color } as React.CSSProperties} />
+            <span className="dot" style={{ "--c": LINEAGES[shop.lineage].color } as CSSProperties} />
             <span>{LINEAGES[shop.lineage].label}</span>
           </p>
           <h2><span>{shop.name}</span><span>{shop.sub}</span></h2>

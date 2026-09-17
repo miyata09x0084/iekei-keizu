@@ -8,17 +8,33 @@
 - 年スライダーと「1974年から再生」による暖簾拡大アニメーション
 - 資本系（町田商店など）は系譜外として別置き
 
-## 使い方
+## 開発
 
-`index.html` をブラウザで開くだけで動作します（D3.js と Google Fonts を CDN から読み込みます）。
+Next.js（App Router / TypeScript）+ D3.js。静的出力（`output: 'export'`）なので任意の静的ホスティングに置けます。
+
+```sh
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # out/ に静的サイトを出力
+npm run lint
+```
+
+### 構成
+
+- `src/data/shops.ts` — 店舗データと型（`Shop`）、系統・関係・状態のラベル
+- `src/lib/layout.ts` — d3.tree による座標計算と系線の生成（純粋関数）
+- `src/lib/ancestry.ts` — 系譜の遡り、絞り込み判定
+- `src/components/TreeCanvas.tsx` — D3 が SVG を専有する描画面。React は class の付け替えだけを伝える
+- `src/components/Keizu.tsx` — 絞り込み・検索・年スライダー・選択の状態管理
+- `src/components/DetailPanel.tsx` / `Legend.tsx`
 
 ## データの編集
 
-`index.html` 内の `NODES` 配列に店舗を追加・修正してください。
+`src/data/shops.ts` の `NODES` 配列に店舗を追加・修正してください。型が付いているので、値の誤りはビルド時に検出されます。
 
-```js
-{ id:'example', name:'屋号', sub:'地名', pref:'神奈川', city:'横浜市', founded:2020, approx:true,
-  parent:'yoshimura', lineage:'direct', status:'open', edge:'direct', note:'解説' }
+```ts
+{ id: "example", name: "屋号", sub: "地名", pref: "神奈川", city: "横浜市", founded: 2020, approx: true,
+  parent: "yoshimura", lineage: "direct", status: "open", edge: "direct", note: "解説" }
 ```
 
 - `parent`: 師匠となる店の `id`（資本系は `null`）

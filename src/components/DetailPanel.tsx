@@ -54,7 +54,7 @@ export function DetailPanel({ shop: current, nodes, onSelect, onClose }: Props) 
           </dl>
           <p className="note">{shop.note}</p>
           {shop.map && (
-            <a className="btn maplink" href={shop.map} target="_blank" rel="noopener noreferrer">
+            <a className="btn maplink" href={shop.map} target="_blank" rel="noopener noreferrer" aria-label="Google マップで開く（新しいタブ）">
               Google マップで開く<span aria-hidden="true">↗</span>
             </a>
           )}

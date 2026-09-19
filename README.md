@@ -34,7 +34,8 @@ npm run lint
 
 ```ts
 { id: "example", name: "屋号", sub: "地名", pref: "神奈川", city: "横浜市", founded: 2020, approx: true,
-  parent: "yoshimura", lineage: "direct", status: "open", edge: "direct", note: "解説" }
+  parent: "yoshimura", lineage: "direct", status: "open", edge: "direct", note: "解説",
+  map: "https://www.google.com/maps/place/?q=place_id:ChIJ..." }
 ```
 
 - `parent`: 師匠となる店の `id`（資本系は `null`）
@@ -42,6 +43,7 @@ npm run lint
 - `edge`: `direct`（直系認定）/ `former`（元直系）/ `trained`（修行・独立）/ `disputed`（諸説あり）
 - `status`: `open` / `closed` / `main-closed`
 - `map`（任意）: その店の Google マップ URL。登録すると詳細パネルに「Google マップで開く」リンクが出る（未登録なら非表示）。
-  `https://www.google.com/maps/place/?q=place_id:<Place ID>` の形式なら店名検索に頼らず確実にその店を指せる
+  `https://www.google.com/maps/place/?q=place_id:<Place ID>` の形式なら店名検索に頼らず確実にその店を指せる。
+  本店閉店（`main-closed`）の店は暖簾を継承する店舗にリンクする。登録前に Google マップ側の店名・住所が `city` と一致することを確認する
 
 系譜は公開情報を編集したものであり、創業年は概算（`approx: true`）を含みます。

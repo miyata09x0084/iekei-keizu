@@ -2,7 +2,7 @@ export type LineageKey =
   | "root" | "direct" | "honmoku" | "rokkaku" | "ichi" | "oudou" | "musashi" | "indep" | "capital";
 export type EdgeKind = "direct" | "former" | "trained" | "disputed";
 export type ShopStatus = "open" | "closed" | "main-closed";
-export type Pref = "神奈川" | "東京" | "千葉" | "茨城";
+export type Pref = "神奈川" | "東京" | "千葉";
 
 export interface Shop {
   id: string;
@@ -45,11 +45,12 @@ export const STATUS_LABEL: Record<ShopStatus, string> = {
   "main-closed": "本店閉店・支店が継承",
 };
 
-export const PREFS: Pref[] = ["神奈川", "東京", "千葉", "茨城"];
+export const PREFS: Pref[] = ["神奈川", "東京", "千葉"];
 export const YEAR_MIN = 1974;
 export const YEAR_MAX = 2026;
 
 // 系譜は公開情報を編集したもの。approx=true の創業年は概算。
+// map は Google マップの place ID 形式 URL。本店閉店（main-closed）の店は暖簾を継承する店舗にリンクする。
 export const NODES: Shop[] = [
   { id: "yoshimura", name: "吉村家", sub: "横浜駅西口", pref: "神奈川", city: "横浜市西区", founded: 1974, parent: null, lineage: "root", status: "open", edge: null,
     note: "1974年、吉村実氏が新杉田に創業。豚骨醤油のスープに酒井製麺の太麺、ほうれん草と海苔、チャーシュー。屋号の「家」がそのまま「家系」の名の由来になった。1999年に横浜駅西口へ移転し、今も総本山として行列が絶えない。",
@@ -57,14 +58,14 @@ export const NODES: Shop[] = [
 
   { id: "honmoku", name: "本牧家", sub: "本牧", pref: "神奈川", city: "横浜市中区", founded: 1985, parent: "yoshimura", lineage: "honmoku", status: "main-closed", edge: "trained",
     note: "吉村家の2号店として本牧に開店。店長だった神藤隆氏が独立して六角家を開き、本牧家自身も後に吉村家から独立した。本牧家系・六角家系という二大分流の源。",
-    map: "https://www.google.com/maps/place/?q=place_id:ChIJd3DULXFAGGARqISz6apcCxg" },
+    map: "https://www.google.com/maps/place/?q=place_id:ChIJd3DULXFAGGARqISz6apcCxg" }, // 横須賀店（本店は2023年閉店）
   { id: "suzuki", name: "寿々喜家", sub: "上星川", pref: "神奈川", city: "横浜市保土ケ谷区", founded: 1995, approx: true, parent: "honmoku", lineage: "honmoku", status: "open", edge: "trained",
     note: "本牧家出身。上星川の住宅街で長く愛される本牧家系の代表格。",
     map: "https://www.google.com/maps/place/?q=place_id:ChIJU0VpY3pZGGARApqOqRIJrBA" },
 
   { id: "rokkaku", name: "六角家", sub: "六角橋", pref: "神奈川", city: "横浜市神奈川区", founded: 1988, parent: "honmoku", lineage: "rokkaku", status: "main-closed", edge: "trained",
     note: "本牧家の店長だった神藤隆氏が六角橋に開店。新横浜ラーメン博物館への出店で「家系」を全国区に押し上げた。本店は2017年に閉店、戸塚店が暖簾を守る。",
-    map: "https://www.google.com/maps/place/?q=place_id:ChIJ-8xabQBbGGARzqnH2mzQNjU" },
+    map: "https://www.google.com/maps/place/?q=place_id:ChIJ-8xabQBbGGARzqnH2mzQNjU" }, // 戸塚店（本店は2017年閉店）
   { id: "kaiichi", name: "介一家", sub: "", pref: "神奈川", city: "横浜市", founded: 1992, approx: true, parent: "rokkaku", lineage: "rokkaku", status: "open", edge: "trained",
     note: "六角家出身。まろやかなスープで六角家系の味を継ぐ。",
     map: "https://www.google.com/maps/place/?q=place_id:ChIJtaZjmtlcGGARoZ9_Pf6LL08" },
@@ -120,14 +121,14 @@ export const NODES: Shop[] = [
   { id: "oudou", name: "王道家", sub: "柏", pref: "千葉", city: "柏市", founded: 2003, parent: "yoshimura", lineage: "oudou", status: "open", edge: "former",
     note: "清水裕正氏が吉村家で修行後、2003年に取手で創業。直系として認定されるも2019年に離脱し、柏へ移転。自家製麺を武器に独自の系譜を築いている。",
     map: "https://www.google.com/maps/place/?q=place_id:ChIJUW3O2uecGGART8x7KUGjCjM" },
-  { id: "torakichi", name: "とらきち家", sub: "取手", pref: "茨城", city: "取手市", founded: 2011, approx: true, parent: "oudou", lineage: "oudou", status: "open", edge: "trained",
-    note: "王道家出身。茨城における王道家系の看板店。",
+  { id: "torakichi", name: "とらきち家", sub: "西神奈川", pref: "神奈川", city: "横浜市神奈川区", founded: 2011, approx: true, parent: "oudou", lineage: "oudou", status: "open", edge: "trained",
+    note: "王道家出身。取手で創業し、横浜の東白楽を経て西神奈川へ移転。現在は「とらきち家 光」として営業する王道家系の看板店。",
     map: "https://www.google.com/maps/place/?q=place_id:ChIJFaAcX6BeGGAR3pcC-DJgTqY" },
   { id: "oudou-shirushi", name: "王道之印", sub: "柏", pref: "千葉", city: "柏市", founded: 2019, approx: true, parent: "oudou", lineage: "oudou", status: "open", edge: "trained",
     note: "王道家の姉妹店。柏に王道家系の一角を形づくる。",
     map: "https://www.google.com/maps/place/?q=place_id:ChIJQUm6QfWdGGARUbR3YBf0rgw" },
-  { id: "oudou-ishii", name: "王道いしい", sub: "柏", pref: "千葉", city: "柏市", founded: 2020, approx: true, parent: "oudou", lineage: "oudou", status: "open", edge: "trained",
-    note: "王道家出身の店主による柏の店。",
+  { id: "oudou-ishii", name: "王道いしい", sub: "千葉", pref: "千葉", city: "千葉市中央区", founded: 2020, approx: true, parent: "oudou", lineage: "oudou", status: "open", edge: "trained",
+    note: "王道家出身の店主による千葉市の店。",
     map: "https://www.google.com/maps/place/?q=place_id:ChIJBVKNvMGbImARrX8LhXM-qoc" },
 
   // 系図に載らない資本系（修行系譜に属さない）

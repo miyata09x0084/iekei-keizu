@@ -3,7 +3,7 @@
 関東の家系ラーメン27店・6世代の修行系譜を、縦書き屋号の伝統的な系図様式で可視化するシングルページWebアプリ。
 
 - 吉村家を頂点にした系図の拡大・縮小・ドラッグ
-- ホバーで吉村家までの系譜をハイライト、クリックで店舗詳細
+- ホバーで吉村家までの系譜をハイライト、クリックで店舗詳細（Google マップへのリンク付き）
 - 系統・都県での絞り込み、屋号検索
 - 年スライダーと「1974年から再生」による暖簾拡大アニメーション
 - 資本系（町田商店など）は系譜外として別置き
@@ -41,5 +41,7 @@ npm run lint
 - `lineage`: `direct` / `honmoku` / `rokkaku` / `ichi` / `oudou` / `musashi` / `indep` / `capital`
 - `edge`: `direct`（直系認定）/ `former`（元直系）/ `trained`（修行・独立）/ `disputed`（諸説あり）
 - `status`: `open` / `closed` / `main-closed`
+- `map`（任意）: その店の Google マップ URL。登録すると詳細パネルに「Google マップで開く」リンクが出る（未登録なら非表示）。
+  `https://www.google.com/maps/place/?q=place_id:<Place ID>` の形式なら店名検索に頼らず確実にその店を指せる
 
 系譜は公開情報を編集したものであり、創業年は概算（`approx: true`）を含みます。

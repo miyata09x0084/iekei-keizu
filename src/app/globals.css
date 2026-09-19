@@ -138,6 +138,8 @@ g.has-lit .link.lit{stroke-width:2.2}
 .facts .badge.open{color:#9DC46C}
 .facts .badge.closed{color:var(--paper-dim);text-decoration:line-through}
 .note{margin:14px 0 0;line-height:1.75;max-width:36em}
+.maplink{display:inline-flex;align-items:center;gap:6px;margin-top:14px;text-decoration:none}
+.maplink span{font-size:11px}
 .panel h3{font-family:var(--mincho);font-weight:500;font-size:13px;letter-spacing:.14em;color:var(--paper-dim);margin:20px 0 8px}
 .rel{display:flex;flex-wrap:wrap;gap:6px}
 .rel .chip{font-family:var(--mincho);font-size:13px;color:var(--paper)}

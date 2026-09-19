@@ -53,6 +53,11 @@ export function DetailPanel({ shop: current, nodes, onSelect, onClose }: Props) 
             <dt>状態</dt><dd><span className={`badge ${shop.status === "open" ? "open" : "closed"}`}>{STATUS_LABEL[shop.status]}</span></dd>
           </dl>
           <p className="note">{shop.note}</p>
+          {shop.map && (
+            <a className="btn maplink" href={shop.map} target="_blank" rel="noopener noreferrer" aria-label="Google マップで開く（新しいタブ）">
+              Google マップで開く<span aria-hidden="true">↗</span>
+            </a>
+          )}
           <h3>師匠</h3>
           <div className="rel">{master ? <RelChip shop={master} onSelect={onSelect} /> : <span className="none">なし</span>}</div>
           <h3>弟子・暖簾分け</h3>
